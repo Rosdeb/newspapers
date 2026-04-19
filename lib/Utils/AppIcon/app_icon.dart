@@ -7,5 +7,6 @@ class AppIcons {
   static String google="assets/icons/google.svg";
   static String apple="assets/icons/apple.svg";
   static String show="assets/icons/show.svg";
+  static String search ="assets/icons/magnifying-glass-solid-full.svg";
 
 }

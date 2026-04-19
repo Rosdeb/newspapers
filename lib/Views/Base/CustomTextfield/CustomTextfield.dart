@@ -15,6 +15,7 @@ class CustomTextField extends StatefulWidget {
   final String? labelText;
   final String? hintText;
   final double? contentPaddingHorizontal;
+  final double borderRadius;
   final double? contentPaddingVertical;
   final FormFieldValidator<String>? validator;
   final bool isPassword;
@@ -48,6 +49,7 @@ class CustomTextField extends StatefulWidget {
     this.maxLines,
     this.enabled,
     this.onSubmitted,
+    this.borderRadius = 12,
     this.obscure = '*',
   });
 
@@ -131,11 +133,14 @@ class _CustomTextFieldState extends State<CustomTextField> {
         ):_buildIcon(widget.suffixIcon, color: suffixColor),
 
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
+          borderRadius: BorderRadius.circular(widget.borderRadius),
+          borderSide: BorderSide(
+            color: widget.borderColor ?? AppColors.blue500.withValues(alpha: 0.70),
+            width: 1.2,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(widget.borderRadius),
           borderSide: BorderSide(
             color: widget.borderColor ??
                 (isDark ? AppColors.DarkThemeText.withValues(alpha: 0.70)
@@ -144,13 +149,13 @@ class _CustomTextFieldState extends State<CustomTextField> {
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(widget.borderRadius),
           borderSide: BorderSide(
               color: isDark ? AppColors.Red.withValues(alpha: 0.30) : AppColors.Red
           ),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(widget.borderRadius),
           borderSide: BorderSide(
             color: isDark ? AppColors.Red.withValues(alpha: 0.30) : AppColors.Red,
             width: 1.1,
