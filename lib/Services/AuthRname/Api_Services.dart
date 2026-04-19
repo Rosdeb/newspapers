@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:get/get.dart';
 import 'package:newspapers/Utils/Logger/logger.dart';
-import '../../Controller/NetworkService/networkservice.dart';
 import '../../Utils/AppConstant/app_constant.dart';
 import '../../Utils/TokenServices/token_services.dart';
 import 'Auth_Services.dart';
@@ -11,22 +9,24 @@ import 'Auth_Services.dart';
 /// Service class for handling all API communications with automatic token management
 /// and error handling.
 class ApiService {
-  static final ApiService _instance = ApiService._internal();
-  factory ApiService() => _instance;
-  ApiService._internal();
+  ApiService({bool Function()? isOnline})
+    : _isOnline = isOnline ?? (() => true);
 
   final TokenService _tokenService = TokenService();
+  final bool Function() _isOnline;
+
+  void _ensureConnected() {
+    if (!_isOnline()) {
+      throw Exception('No internet connection');
+    }
+  }
 
   Future<Map<String, dynamic>?> get({
     required String endpoint,
     Map<String, String>? headers,
     bool requiresAuth = true,
   }) async {
-    final networkController = Get.find<NetworkController>();
-
-    if (!networkController.isOnline.value) {
-      throw Exception('No internet connection');
-    }
+    _ensureConnected();
 
     String url = '${AppConstants.BASE_URL}$endpoint';
 
@@ -48,12 +48,12 @@ class ApiService {
 
       AppLogger.log('Making GET request to: $url', type: 'info');
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: requestHeaders,
-      );
+      final response = await http.get(Uri.parse(url), headers: requestHeaders);
 
-      AppLogger.log('GET Response Status: ${response.statusCode}', type: 'info');
+      AppLogger.log(
+        'GET Response Status: ${response.statusCode}',
+        type: 'info',
+      );
       AppLogger.log('GET Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200) {
@@ -79,7 +79,10 @@ class ApiService {
             headers: retryHeaders,
           );
 
-          AppLogger.log('Retry GET Response Status: ${retryResponse.statusCode}', type: 'info');
+          AppLogger.log(
+            'Retry GET Response Status: ${retryResponse.statusCode}',
+            type: 'info',
+          );
 
           if (retryResponse.statusCode == 200) {
             return json.decode(retryResponse.body);
@@ -114,11 +117,7 @@ class ApiService {
     Map<String, String>? headers,
     bool requiresAuth = true,
   }) async {
-    final networkController = Get.find<NetworkController>();
-
-    if (!networkController.isOnline.value) {
-      throw Exception('No internet connection');
-    }
+    _ensureConnected();
 
     String url = '${AppConstants.BASE_URL}$endpoint';
 
@@ -149,7 +148,10 @@ class ApiService {
         body: bodyString,
       );
 
-      AppLogger.log('POST Response Status: ${response.statusCode}', type: 'info');
+      AppLogger.log(
+        'POST Response Status: ${response.statusCode}',
+        type: 'info',
+      );
       AppLogger.log('POST Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -176,7 +178,10 @@ class ApiService {
             body: bodyString,
           );
 
-          AppLogger.log('Retry POST Response Status: ${retryResponse.statusCode}', type: 'info');
+          AppLogger.log(
+            'Retry POST Response Status: ${retryResponse.statusCode}',
+            type: 'info',
+          );
 
           if (retryResponse.statusCode == 200) {
             return json.decode(retryResponse.body);
@@ -211,11 +216,7 @@ class ApiService {
     Map<String, String>? headers,
     bool requiresAuth = true,
   }) async {
-    final networkController = Get.find<NetworkController>();
-
-    if (!networkController.isOnline.value) {
-      throw Exception('No internet connection');
-    }
+    _ensureConnected();
 
     String url = '${AppConstants.BASE_URL}$endpoint';
 
@@ -246,7 +247,10 @@ class ApiService {
         body: bodyString,
       );
 
-      AppLogger.log('PUT Response Status: ${response.statusCode}', type: 'info');
+      AppLogger.log(
+        'PUT Response Status: ${response.statusCode}',
+        type: 'info',
+      );
       AppLogger.log('PUT Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -273,7 +277,10 @@ class ApiService {
             body: bodyString,
           );
 
-          AppLogger.log('Retry PUT Response Status: ${retryResponse.statusCode}', type: 'info');
+          AppLogger.log(
+            'Retry PUT Response Status: ${retryResponse.statusCode}',
+            type: 'info',
+          );
 
           if (retryResponse.statusCode == 200) {
             return json.decode(retryResponse.body);
@@ -307,11 +314,7 @@ class ApiService {
     Map<String, String>? headers,
     bool requiresAuth = true,
   }) async {
-    final networkController = Get.find<NetworkController>();
-
-    if (!networkController.isOnline.value) {
-      throw Exception('No internet connection');
-    }
+    _ensureConnected();
 
     String url = '${AppConstants.BASE_URL}$endpoint';
 
@@ -338,7 +341,10 @@ class ApiService {
         headers: requestHeaders,
       );
 
-      AppLogger.log('DELETE Response Status: ${response.statusCode}', type: 'info');
+      AppLogger.log(
+        'DELETE Response Status: ${response.statusCode}',
+        type: 'info',
+      );
       AppLogger.log('DELETE Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -364,9 +370,12 @@ class ApiService {
             headers: retryHeaders,
           );
 
-          AppLogger.log('Retry DELETE Response Status: ${retryResponse.statusCode}', type: 'info');
+          AppLogger.log(
+            'Retry DELETE Response Status: ${retryResponse.statusCode}',
+            type: 'info',
+          );
 
-          if (retryResponse.statusCode == 200 || response.statusCode ==201) {
+          if (retryResponse.statusCode == 200 || response.statusCode == 201) {
             return true;
           } else {
             _handleErrorResponse(retryResponse.statusCode, response.body);
@@ -394,16 +403,25 @@ class ApiService {
   }
 
   Future<bool> _handleTokenRefresh() async {
-    AppLogger.log('Attempting to refresh token using AuthService...', type: 'info');
+    AppLogger.log(
+      'Attempting to refresh token using AuthService...',
+      type: 'info',
+    );
 
     // Use the enhanced AuthService to handle token validation and refresh
     bool result = await AuthService.validateAndRefreshToken();
 
     if (result) {
-      AppLogger.log('Token validated and/or refreshed successfully via AuthService', type: 'success');
+      AppLogger.log(
+        'Token validated and/or refreshed successfully via AuthService',
+        type: 'success',
+      );
       return true;
     } else {
-      AppLogger.log('Failed to validate and refresh token via AuthService', type: 'error');
+      AppLogger.log(
+        'Failed to validate and refresh token via AuthService',
+        type: 'error',
+      );
       return false;
     }
   }
@@ -457,7 +475,10 @@ class ApiService {
         AppLogger.log('Internal Server Error', type: 'error');
         break;
       default:
-        AppLogger.log('Unknown error with status code: $statusCode', type: 'error');
+        AppLogger.log(
+          'Unknown error with status code: $statusCode',
+          type: 'error',
+        );
     }
   }
 
@@ -466,11 +487,7 @@ class ApiService {
     Map<String, String>? headers,
     bool requiresAuth = true,
   }) async {
-    final networkController = Get.find<NetworkController>();
-
-    if (!networkController.isOnline.value) {
-      throw Exception('No internet connection');
-    }
+    _ensureConnected();
 
     String url = '${AppConstants.BASE_URL}$endpoint';
 
@@ -492,12 +509,12 @@ class ApiService {
 
       AppLogger.log('Making GET request to: $url', type: 'info');
 
-      final response = await http.get(
-        Uri.parse(url),
-        headers: requestHeaders,
-      );
+      final response = await http.get(Uri.parse(url), headers: requestHeaders);
 
-      AppLogger.log('GET Response Status: ${response.statusCode}', type: 'info');
+      AppLogger.log(
+        'GET Response Status: ${response.statusCode}',
+        type: 'info',
+      );
       AppLogger.log('GET Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200) {
@@ -525,7 +542,10 @@ class ApiService {
             headers: retryHeaders,
           );
 
-          AppLogger.log('Retry GET Response Status: ${retryResponse.statusCode}', type: 'info');
+          AppLogger.log(
+            'Retry GET Response Status: ${retryResponse.statusCode}',
+            type: 'info',
+          );
 
           if (retryResponse.statusCode == 200) {
             var decoded = json.decode(retryResponse.body);
@@ -562,11 +582,7 @@ class ApiService {
     bool requiresAuth = true,
   }) async {
     await _tokenService.init(); // Ensure token service is initialized
-    final networkController = Get.find<NetworkController>();
-
-    if (!networkController.isOnline.value) {
-      throw Exception('No internet connection');
-    }
+    _ensureConnected();
 
     String url = '${AppConstants.BASE_URL}$endpoint';
 
@@ -586,7 +602,9 @@ class ApiService {
 
       requestHeaders['Content-Type'] = 'application/json';
 
-      String bodyString = body != null ? (body is String ? body : json.encode(body)) : '';
+      String bodyString = body != null
+          ? (body is String ? body : json.encode(body))
+          : '';
 
       AppLogger.log('Making PATCH request to: $url', type: 'info');
       AppLogger.log('PATCH Request Body: $bodyString', type: 'info');
@@ -597,7 +615,10 @@ class ApiService {
         body: bodyString,
       );
 
-      AppLogger.log('PATCH Response Status: ${response.statusCode}', type: 'info');
+      AppLogger.log(
+        'PATCH Response Status: ${response.statusCode}',
+        type: 'info',
+      );
       AppLogger.log('PATCH Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -625,11 +646,16 @@ class ApiService {
             body: bodyString,
           );
 
-          AppLogger.log('Retry PATCH Response Status: ${retryResponse.statusCode}', type: 'info');
+          AppLogger.log(
+            'Retry PATCH Response Status: ${retryResponse.statusCode}',
+            type: 'info',
+          );
 
           if (retryResponse.statusCode == 200) {
             final decoded = json.decode(retryResponse.body);
-            return decoded is Map<String, dynamic> ? decoded : {'data': decoded};
+            return decoded is Map<String, dynamic>
+                ? decoded
+                : {'data': decoded};
           } else {
             _handleErrorResponse(retryResponse.statusCode, response.body);
             return null;
@@ -662,11 +688,7 @@ class ApiService {
     Map<String, String>? headers,
     bool requiresAuth = true,
   }) async {
-    final networkController = Get.find<NetworkController>();
-
-    if (!networkController.isOnline.value) {
-      throw Exception('No internet connection');
-    }
+    _ensureConnected();
 
     String url = '${AppConstants.BASE_URL}$endpoint';
 
@@ -698,8 +720,14 @@ class ApiService {
       final response = await request.send();
       final responseBody = await response.stream.bytesToString();
 
-      AppLogger.log('PATCH multipart Response Status: ${response.statusCode}', type: 'info');
-      AppLogger.log('PATCH multipart Response Body: $responseBody', type: 'info');
+      AppLogger.log(
+        'PATCH multipart Response Status: ${response.statusCode}',
+        type: 'info',
+      );
+      AppLogger.log(
+        'PATCH multipart Response Body: $responseBody',
+        type: 'info',
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(responseBody);
@@ -728,9 +756,13 @@ class ApiService {
           final retryResponse = await retryRequest.send();
           final retryResponseBody = await retryResponse.stream.bytesToString();
 
-          AppLogger.log('Retry PATCH multipart Response Status: ${retryResponse.statusCode}', type: 'info');
+          AppLogger.log(
+            'Retry PATCH multipart Response Status: ${retryResponse.statusCode}',
+            type: 'info',
+          );
 
-          if (retryResponse.statusCode == 200 || retryResponse.statusCode == 201) {
+          if (retryResponse.statusCode == 200 ||
+              retryResponse.statusCode == 201) {
             return json.decode(retryResponseBody);
           } else {
             _handleErrorResponse(retryResponse.statusCode, retryResponseBody);

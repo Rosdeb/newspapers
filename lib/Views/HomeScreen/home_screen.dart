@@ -42,12 +42,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18.0),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: [
             CustomTextField(
               borderRadius: 12,
-              height: 40,
+              height: 45,
               controller: searchcontroller,
               hintText: "search news",
               borderColor: AppColors.gray500,
@@ -59,13 +59,9 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 16),
             Expanded(
               child: BlocConsumer<HomeBloc, HomeState>(
-                listenWhen: (previous, current) =>
-                    previous.errorMessage != current.errorMessage &&
-                    current.errorMessage != null,
+                listenWhen: (previous, current) => previous.errorMessage != current.errorMessage && current.errorMessage != null,
                 listener: (context, state) {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
                 },
                 builder: (context, state) {
                   if (state.status == HomeStatus.loading &&
