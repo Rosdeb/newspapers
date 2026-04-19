@@ -1,0 +1,87 @@
+import 'package:flutter/material.dart';
+
+class CustomShimmer extends StatefulWidget {
+  final double width;
+  final double height;
+  final BorderRadius? borderRadius;
+  final ShapeBorder? shape;
+
+  const CustomShimmer({
+    super.key,
+    required this.width,
+    required this.height,
+    this.borderRadius,
+    this.shape,
+  });
+
+  @override
+  State<CustomShimmer> createState() => _CustomShimmerState();
+}
+
+class _CustomShimmerState extends State<CustomShimmer>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1300),
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final baseColor = Colors.grey.shade300;
+    final highlightColor = Colors.grey.shade100;
+
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return ShaderMask(
+          shaderCallback: (bounds) {
+            return LinearGradient(
+              begin: Alignment(-1.0 + (2 * _controller.value), 0),
+              end: Alignment(1.0 + (2 * _controller.value), 0),
+              colors: [
+                baseColor,
+                highlightColor,
+                baseColor,
+              ],
+              stops: const [0.25, 0.5, 0.75],
+            ).createShader(bounds);
+          },
+          blendMode: BlendMode.srcATop,
+          child: child,
+        );
+      },
+      child: widget.shape != null
+          ? Material(
+        color: baseColor,
+        shape: widget.shape,
+        child: SizedBox(
+          width: widget.width,
+          height: widget.height,
+        ),
+      )
+          : Container(
+        width: widget.width,
+        height: widget.height,
+        decoration: BoxDecoration(
+          color: baseColor,
+          borderRadius: widget.borderRadius ?? BorderRadius.circular(8),
+        ),
+      ),
+    );
+  }
+}
+
+
+
