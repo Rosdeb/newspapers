@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:newspapers/Router/route_names.dart';
+import 'package:newspapers/Views/HomeScreen/home_screen.dart';
 
 class MyAppRouter {
   MyAppRouter._();
+
   static final MyAppRouter instance = MyAppRouter._();
 
   late final GoRouter router = GoRouter(
-    initialLocation: AppPath.splash,
+    initialLocation: AppPath.home,
     routes: [
-      // GoRoute(
-      //   path: AppPath.splash,
-      //   name: AppRouteName.splash,
-      //   pageBuilder: (context, state) =>
-      //       MaterialPage(child: SplashScreen()),
-      // ),
+      GoRoute(
+        path: AppPath.home,
+        name: AppRouteName.home,
+        pageBuilder: (context, state) =>
+            MaterialPage(child: HomeScreen()),
+      ),
       // GoRoute(
       //   path: AppPath.home,
       //   name: AppRouteName.home,
