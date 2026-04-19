@@ -6,15 +6,16 @@ import 'package:newspapers/bloc/home/home_state.dart';
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({required NewsRepository newsRepository})
     : _newsRepository = newsRepository,
-      super(const HomeState()) {on<HomeFetched>(_onHomeFetched);
+      super(const HomeState()) {
+    on<HomeFetched>(_onHomeFetched);
   }
 
   final NewsRepository _newsRepository;
 
   Future<void> _onHomeFetched(
-      HomeFetched event,
-      Emitter<HomeState> emit,
-      ) async {
+    HomeFetched event,
+    Emitter<HomeState> emit,
+  ) async {
     final query = event.query.trim();
     final category = event.category ?? state.category;
 
@@ -53,5 +54,4 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       );
     }
   }
-
 }

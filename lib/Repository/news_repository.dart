@@ -14,7 +14,7 @@ class NewsRepository {
 
   Future<List<Article>> fetchArticles({
     required String query,
-    required String category,
+    required String? category,
   }) async {
     final normalizedQuery = query.trim();
     final fromDate = DateFormat(
@@ -36,7 +36,7 @@ class NewsRepository {
       endpoint =
           '/v2/top-headlines'
           '?country=us'
-          '&category=${Uri.encodeQueryComponent(category)}'
+          '&category=$category'
           '&apiKey=${AppConstants.API_KEY}';
     }
 

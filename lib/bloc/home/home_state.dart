@@ -2,15 +2,13 @@ import 'package:newspapers/Models/NewspapersModels/newspapers.dart';
 
 enum HomeStatus { initial, loading, success, failure }
 
-enum NewsCategory {
-  business,
-  technology,
-  entertainment,
-}
+enum NewsCategory { general, business, technology, entertainment }
 
 extension NewsCategoryX on NewsCategory {
   String get label {
     switch (this) {
+      case NewsCategory.general:
+        return 'All';
       case NewsCategory.business:
         return 'Business';
       case NewsCategory.technology:
@@ -22,6 +20,8 @@ extension NewsCategoryX on NewsCategory {
 
   String get apiValue {
     switch (this) {
+      case NewsCategory.general:
+        return 'general';
       case NewsCategory.business:
         return 'business';
       case NewsCategory.technology:
@@ -32,12 +32,13 @@ extension NewsCategoryX on NewsCategory {
   }
 }
 
+
 class HomeState {
   const HomeState({
     this.status = HomeStatus.initial,
     this.articles = const [],
     this.query = '',
-    this.category = NewsCategory.business,
+    this.category = NewsCategory.general,
     this.errorMessage,
   });
 
@@ -63,5 +64,3 @@ class HomeState {
     );
   }
 }
-
-
