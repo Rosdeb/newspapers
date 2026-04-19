@@ -14,6 +14,7 @@ class CustomTextField extends StatefulWidget {
   final Color? suffixIconColor;
   final String? labelText;
   final String? hintText;
+  final double? height;
   final double? contentPaddingHorizontal;
   final double borderRadius;
   final double? contentPaddingVertical;
@@ -32,6 +33,7 @@ class CustomTextField extends StatefulWidget {
     required this.controller,
     this.keyboardType,
     this.borderColor,
+    this.height,
     this.filColor,
     this.prefixIcon,
     this.suffixIcon,
@@ -87,86 +89,89 @@ class _CustomTextFieldState extends State<CustomTextField> {
     final prefixColor = widget.prefixIconColor ?? inputTheme.prefixIconColor;
     final suffixColor = widget.suffixIconColor ?? inputTheme.suffixIconColor;
 
-    return TextFormField(
-      onFieldSubmitted: (value) => widget.onSubmitted?.call(value),
-      controller: widget.controller,
-      keyboardType: widget.keyboardType ?? TextInputType.text,
-      maxLines: widget.isPassword ? 1 : widget.maxLines,
-      obscureText: widget.isPassword ? obscureText : false,
-      obscuringCharacter: widget.obscure,
-      enabled: widget.enabled ?? true,
-      autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.disabled,
-      validator: widget.validator ?? (value) {
-            if (value == null || value.isEmpty) {
-              return "Please enter ${widget.hintText?.toLowerCase() ?? 'this field'}";
-            }
-            if (widget.isEmail == true) {
-              final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
-              if (!emailRegex.hasMatch(value)) return "Please enter a valid email";
-            }
-            return null;
-          },
-      onChanged: widget.onChanged,
-      cursorColor: isDark ? AppColors.DarkThemeText : AppColors.DarkBlue,
-      style: TextStyle(
-        color: isDark ? AppColors.DarkThemeText : AppColors.DarkBlue,
-        fontSize: 16,
-        fontWeight: FontWeight.w500,
-      ),
-      decoration: InputDecoration(
-        labelText: widget.labelText,
-        hintText: widget.hintText,
-        filled: widget.filColor != null,
-        fillColor: widget.filColor ?? (isDark ? AppColors.White : null),
-        contentPadding: EdgeInsets.symmetric(
-          horizontal: widget.contentPaddingHorizontal ?? 12,
-          vertical: widget.contentPaddingVertical ?? 14,
+    return SizedBox(
+      height: widget.height ?? 50,
+      child: TextFormField(
+        onFieldSubmitted: (value) => widget.onSubmitted?.call(value),
+        controller: widget.controller,
+        keyboardType: widget.keyboardType ?? TextInputType.text,
+        maxLines: widget.isPassword ? 1 : widget.maxLines,
+        obscureText: widget.isPassword ? obscureText : false,
+        obscuringCharacter: widget.obscure,
+        enabled: widget.enabled ?? true,
+        autovalidateMode: widget.autovalidateMode ?? AutovalidateMode.disabled,
+        validator: widget.validator ?? (value) {
+              if (value == null || value.isEmpty) {
+                return "Please enter ${widget.hintText?.toLowerCase() ?? 'this field'}";
+              }
+              if (widget.isEmail == true) {
+                final emailRegex = RegExp(r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$");
+                if (!emailRegex.hasMatch(value)) return "Please enter a valid email";
+              }
+              return null;
+            },
+        onChanged: widget.onChanged,
+        cursorColor: isDark ? AppColors.DarkThemeText : AppColors.DarkBlue,
+        style: TextStyle(
+          color: isDark ? AppColors.DarkThemeText : AppColors.DarkBlue,
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
         ),
-        prefixIcon: _buildIcon(widget.prefixIcon, color: prefixColor),
-        suffixIcon: widget.isPassword ? GestureDetector(
-          onTap: toggle,
-          child: _buildIcon(
-            obscureText ? AppIcons.hide : AppIcons.show,
-            size: 16,
-            color: suffixColor,
+        decoration: InputDecoration(
+          labelText: widget.labelText,
+          hintText: widget.hintText,
+          filled: widget.filColor != null,
+          fillColor: widget.filColor ?? (isDark ? AppColors.White : null),
+          contentPadding: EdgeInsets.symmetric(
+            horizontal: widget.contentPaddingHorizontal ?? 12,
+            vertical: widget.contentPaddingVertical ?? 14,
           ),
-        ):_buildIcon(widget.suffixIcon, color: suffixColor),
+          prefixIcon: _buildIcon(widget.prefixIcon, color: prefixColor),
+          suffixIcon: widget.isPassword ? GestureDetector(
+            onTap: toggle,
+            child: _buildIcon(
+              obscureText ? AppIcons.hide : AppIcons.show,
+              size: 16,
+              color: suffixColor,
+            ),
+          ):_buildIcon(widget.suffixIcon, color: suffixColor),
 
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: BorderSide(
-            color: widget.borderColor ?? AppColors.blue500.withValues(alpha: 0.70),
-            width: 1.2,
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            borderSide: BorderSide(
+              color: widget.borderColor ?? AppColors.blue500.withValues(alpha: 0.70),
+              width: 1.2,
+            ),
           ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: BorderSide(
-            color: widget.borderColor ??
-                (isDark ? AppColors.DarkThemeText.withValues(alpha: 0.70)
-                    : AppColors.blue500.withValues(alpha: 0.70)),
-            width: 1.2,
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            borderSide: BorderSide(
+              color: widget.borderColor ??
+                  (isDark ? AppColors.DarkThemeText.withValues(alpha: 0.70)
+                      : AppColors.blue500.withValues(alpha: 0.70)),
+              width: 1.2,
+            ),
           ),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: BorderSide(
-              color: isDark ? AppColors.Red.withValues(alpha: 0.30) : AppColors.Red
+          errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            borderSide: BorderSide(
+                color: isDark ? AppColors.Red.withValues(alpha: 0.30) : AppColors.Red
+            ),
           ),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          borderSide: BorderSide(
-            color: isDark ? AppColors.Red.withValues(alpha: 0.30) : AppColors.Red,
-            width: 1.1,
+          focusedErrorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+            borderSide: BorderSide(
+              color: isDark ? AppColors.Red.withValues(alpha: 0.30) : AppColors.Red,
+              width: 1.1,
+            ),
           ),
-        ),
-        hintStyle: TextStyle(
-          color: isDark
-              ? AppColors.DarkThemeSecondaryText
-              : Theme.of(context).textTheme.titleSmall?.color,
-          fontSize: 15,
-          fontWeight: FontWeight.w400,
+          hintStyle: TextStyle(
+            color: isDark
+                ? AppColors.DarkThemeSecondaryText
+                : Theme.of(context).textTheme.titleSmall?.color,
+            fontSize: 15,
+            fontWeight: FontWeight.w400,
+          ),
         ),
       ),
     );

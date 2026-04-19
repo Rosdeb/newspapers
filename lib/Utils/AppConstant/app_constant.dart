@@ -4,8 +4,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AppConstants{
   //-------------- base url set here ---------------------//
-  static const String BASE_URL="https://rosdeb.xdtunnel.icu/api/v1";
-  static String get APP_NAME => dotenv.env['API_KEY'] ?? 'DefaultAppName';
+  static const String BASE_URL="https://newsapi.org";
+  static String get API_KEY => dotenv.env['API_KEY'] ?? 'DefaultAppName';
 
   // share preference Key
   static String THEME ="theme";
