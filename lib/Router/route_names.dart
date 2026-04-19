@@ -9,7 +9,7 @@ abstract class AppRouteName {
 abstract class AppPath {
 
   static const home                = '/home_screen';
-  static const offline             = 'offlinePage';
-  static const articales_details   = 'articales_details';
+  static const offline             = '/offlinePage';
+  static const articales_details   = '/articales_details';
 
 }

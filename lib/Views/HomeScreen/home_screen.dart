@@ -46,7 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
-      body: Padding(
+      body: NestedScrollView(
+        headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
+          return <Widget>[];
+        },
+        body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
           children: [
@@ -206,6 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
       ),
+      )
     );
   }
 }

@@ -50,10 +50,7 @@ class ApiService {
 
       final response = await http.get(Uri.parse(url), headers: requestHeaders);
 
-      AppLogger.log(
-        'GET Response Status: ${response.statusCode}',
-        type: 'info',
-      );
+      AppLogger.log('GET Response Status: ${response.statusCode}', type: 'info',);
       AppLogger.log('GET Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200) {
@@ -148,10 +145,7 @@ class ApiService {
         body: bodyString,
       );
 
-      AppLogger.log(
-        'POST Response Status: ${response.statusCode}',
-        type: 'info',
-      );
+      AppLogger.log('POST Response Status: ${response.statusCode}', type: 'info',);
       AppLogger.log('POST Response Body: ${response.body}', type: 'info');
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -178,10 +172,7 @@ class ApiService {
             body: bodyString,
           );
 
-          AppLogger.log(
-            'Retry POST Response Status: ${retryResponse.statusCode}',
-            type: 'info',
-          );
+          AppLogger.log('Retry POST Response Status: ${retryResponse.statusCode}', type: 'info',);
 
           if (retryResponse.statusCode == 200) {
             return json.decode(retryResponse.body);

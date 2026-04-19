@@ -13,7 +13,6 @@ import 'package:newspapers/bloc/network/network_state.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-
   final scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
   final networkCubit = NetworkCubit();
   await networkCubit.initialize();
@@ -56,13 +55,12 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: networkCubit),
-        BlocProvider(
-          create: (_) =>
-              HomeBloc(newsRepository: newsRepository)
+        BlocProvider(create: (_) =>
+          HomeBloc(newsRepository: newsRepository)
                 ..add(const HomeFetched()),
         ),
       ],
-      child: _AppView(
+      child: AppView(
         router: _router,
         scaffoldMessengerKey: _scaffoldMessengerKey,
       ),
@@ -70,8 +68,8 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class _AppView extends StatelessWidget {
-  const _AppView({required this.router, required this.scaffoldMessengerKey});
+class AppView extends StatelessWidget {
+  const AppView({required this.router, required this.scaffoldMessengerKey});
 
   final GoRouter router;
   final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey;
@@ -79,29 +77,9 @@ class _AppView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocListener<NetworkCubit, NetworkState>(
-      listenWhen: (previous, current) =>
-          previous.status != current.status && current.hasCheckedConnection,
+      listenWhen: (previous, current) => previous.status != current.status && current.hasCheckedConnection,
       listener: (context, state) {
-        scaffoldMessengerKey.currentState
-          ?..hideCurrentSnackBar()
-          ..showSnackBar(
-            SnackBar(
-              content: Text(
-                state.isOnline ? 'Back Online' : 'No Internet Connection',
-                style: const TextStyle(color: Colors.white),
-              ),
-              backgroundColor: state.isOnline
-                  ? Colors.green.shade400
-                  : Colors.red.shade400,
-              duration: state.isOnline
-                  ? const Duration(seconds: 2)
-                  : const Duration(seconds: 3),
-              behavior: SnackBarBehavior.floating,
-            ),
-          );
-
         router.go(state.isOnline ? AppPath.home : AppPath.offline);
-
         if (state.isOnline) {
           context.read<HomeBloc>().add(
             HomeFetched(query: context.read<HomeBloc>().state.query),
@@ -112,7 +90,7 @@ class _AppView extends StatelessWidget {
         routerConfig: router,
         scaffoldMessengerKey: scaffoldMessengerKey,
         debugShowCheckedModeBanner: false,
-        title: 'NewsFeed',
+        title: 'Newspapers',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),
