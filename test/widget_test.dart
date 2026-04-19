@@ -8,7 +8,7 @@ import 'package:newspapers/bloc/network/network_cubit.dart';
 
 class FakeNewsRepository extends NewsRepository {
   @override
-  Future<List<Article>> fetchArticles({String query = 'tesla'}) async => [];
+  Future<List<Article>> fetchArticles({required String query, required String category,}) async => [];
 }
 
 void main() {

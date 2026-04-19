@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:newspapers/Utils/AppIcon/app_icon.dart';
 import 'package:newspapers/Utils/AppImage/app_image.dart';
+import 'package:newspapers/Utils/AppSpacing/app_spacing.dart';
+import 'package:newspapers/Utils/Typography/app_typography.dart';
 import 'package:newspapers/Views/Base/AppText/appText.dart';
 import 'package:newspapers/Views/Base/CustomTextfield/CustomTextfield.dart';
 import 'package:newspapers/Views/Base/IOSTapEffect/iosTapEffect.dart';
@@ -62,10 +64,100 @@ class _HomeScreenState extends State<HomeScreen> {
               borderColor: AppColors.gray500,
               prefixIcon: AppIcons.search,
               onSubmitted: (value) {
-                context.read<HomeBloc>().add(HomeFetched(query: value));
+                context.read<HomeBloc>().add(
+                  HomeFetched(
+                    query: value,
+                    category: context.read<HomeBloc>().state.category,
+                  ),
+                );
               },
             ),
             const SizedBox(height: 16),
+
+            SizedBox(
+              height: 42,
+              child: BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  final categories = NewsCategory.values;
+
+                  return ListView.separated(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    scrollDirection: Axis.horizontal,
+                    itemCount: categories.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 10),
+                    itemBuilder: (context, index) {
+                      final category = categories[index];
+                      final isSelected = state.category == category;
+
+                      return IosTapEffect(
+                        onTap: () {
+                          context.read<HomeBloc>().add(
+                            HomeFetched(
+                              query: context.read<HomeBloc>().state.query,
+                              category: category,
+                            ),
+                          );
+                        },
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOut,
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(30),
+                            color: isSelected ? AppColors.blue400 : Colors.transparent,
+                            border: Border.all(
+                              color: isSelected ? AppColors.blue200 : AppColors.blue200,
+                              width: 1.2,
+                            ),
+                            boxShadow: isSelected
+                                ? [
+                              BoxShadow(
+                                color: AppColors.blue200.withOpacity(0.25),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              )
+                            ]
+                                : [],
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 200),
+                                transitionBuilder: (child, animation) =>
+                                    ScaleTransition(scale: animation, child: child),
+                                child: isSelected
+                                    ? const Icon(
+                                  Icons.check,
+                                  key: ValueKey(true),
+                                  size: 16,
+                                  color: Colors.white,
+                                ) : const SizedBox(key: ValueKey(false)),
+                              ),
+
+                              if (isSelected) const SizedBox(width: 6),
+
+                              AppText(
+                                category.label,
+                                fontSize: 14,
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.black,
+                                fontWeight:
+                                isSelected ? FontWeight.w600 : FontWeight.w500,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            const SizedBox(height: AppSpacing.s16),
             Expanded(
               child: BlocConsumer<HomeBloc, HomeState>(
                 listenWhen: (previous, current) => previous.errorMessage != current.errorMessage && current.errorMessage != null,
@@ -106,7 +198,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: AppColors.gray0,
                     onRefresh: () async {
                       context.read<HomeBloc>().add(
-                        HomeFetched(query: searchcontroller.text),
+                        HomeFetched(
+                          query: searchcontroller.text,
+                          category: context.read<HomeBloc>().state.category,
+                        ),
                       );
                     },
                     child: ListView.builder(
@@ -125,12 +220,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: Container(
                             margin: EdgeInsets.only(bottom: 12),
                             decoration: BoxDecoration(
-                              color: AppColors.gray50,
+                              color: AppColors.gray0,
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
                                   blurRadius: 5,
-                                  color: AppColors.gray50,
+                                  color: AppColors.gray200,
                                   offset: const Offset(0, 0),
                                 ),
                               ],
@@ -169,6 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               : 'Unknown author',
                                           maxLines: 1,
                                           fontSize: 14,
+                                          style: AppTypography.bodyLarge,
                                           fontWeight: FontWeight.w600,
                                           textAlign: TextAlign.start,
                                           overflow: TextOverflow.ellipsis,
@@ -179,6 +275,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         article.publishedAt ?? "",
                                         maxLines: 1,
                                         fontSize: 12,
+                                        style: AppTypography.bodySmall,
                                         fontWeight: FontWeight.w400,
                                         textAlign: TextAlign.end,
                                         overflow: TextOverflow.ellipsis,
@@ -192,7 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: AppText(
                                     article.title ?? 'No title',
                                     maxLines: 2,
-                                    fontSize: 14,
+                                    fontSize: 16,
                                     textAlign: TextAlign.start,
                                     overflow: TextOverflow.ellipsis,
                                   ),
