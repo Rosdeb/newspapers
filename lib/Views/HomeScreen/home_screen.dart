@@ -14,6 +14,8 @@ import 'package:newspapers/bloc/home/home_event.dart';
 import 'package:newspapers/bloc/home/home_state.dart';
 import 'package:newspapers/utils/AppColor/app_colors.dart';
 
+import '../../Router/route_names.dart';
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -96,6 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   }
 
                   return RefreshIndicator(
+                    color: AppColors.blue500,
+                    backgroundColor: AppColors.gray0,
                     onRefresh: () async {
                       context.read<HomeBloc>().add(
                         HomeFetched(query: searchcontroller.text),
@@ -107,7 +111,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         final article = state.articles[index];
                         return IosTapEffect(
                           onTap: (){
-                            context.pushNamed('..fadf');
+                            final article = state.articles[index];
+                            context.pushNamed(
+                              AppRouteName.articales_details,
+                              extra: article,
+                            );
+
                           },
                           child: Container(
                             margin: EdgeInsets.only(bottom: 12),
@@ -144,6 +153,36 @@ class _HomeScreenState extends State<HomeScreen> {
                                         ),
                                   ),
                                 ),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 12, left: 12, right: 12),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: AppText(
+                                          article.author?.trim().isNotEmpty == true
+                                              ? article.author!
+                                              : 'Unknown author',
+                                          maxLines: 1,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                          textAlign: TextAlign.start,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      AppText(
+                                        article.publishedAt ?? "",
+                                        maxLines: 1,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w400,
+                                        textAlign: TextAlign.end,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+
                                 Padding(
                                   padding: const EdgeInsets.all(12),
                                   child: AppText(
