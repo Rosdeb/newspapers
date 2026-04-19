@@ -140,9 +140,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               AppText(
                                 category.label,
                                 fontSize: 14,
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.black,
+                                color: isSelected ? Colors.white : Colors.black,
                                 fontWeight:
                                 isSelected ? FontWeight.w600 : FontWeight.w500,
                               ),
