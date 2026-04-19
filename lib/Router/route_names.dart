@@ -1,6 +1,6 @@
 abstract class AppRouteName {
-  // Auth
-  static const splash   = 'splash';
+  // AuthRname
+  static const offline   = 'offlinePage';
   static const login    = 'login';
   static const register = 'register';
   static const notedetails = 'notedetailScreen';
@@ -16,6 +16,7 @@ abstract class AppPath {
   static const login      = '/LoginScreen';
   static const register   = '/RegistrationScreen';
   static const home       = '/home_screen';
+  static const offline   = 'offlinePage';
   static const notedetails  = '/notedetailScreen';
   static const createnoteScreen  = '/createnoteScreen';
   static const editScreen  = '/editScreen';
